@@ -1,0 +1,26 @@
+{
+	"name": "vadiok/simple-panel-core",
+	"description": "Core code of SimplePanel project.",
+	"require": {
+		"php": ">=5.5.9",
+		"illuminate/database": "~5.2.0",
+		"illuminate/filesystem": "~5.2.0",
+		"twig/twig": "~1.0"
+	},
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Vlad Tokarev",
+			"email": "vladvtok@mail.ru"
+		}
+	],
+	"minimum-stability": "stable",
+	"config": {
+		"preferred-install": "dist"
+	},
+	"autoload": {
+		"psr-4": {
+			"SimplePanel\\": "src/SimplePanel/"
+		}
+	}
+}
