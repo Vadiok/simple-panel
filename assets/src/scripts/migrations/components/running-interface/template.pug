@@ -1,0 +1,51 @@
+div
+	hr
+	h4
+		button.btn.btn-sm(type="button", @click="toggleContent",)
+			span(v-if="!collapseContent") &ndash;
+			span(v-else) +
+		=' '
+		| Выполнение миграций
+	div(v-show="!collapseContent")
+		div(v-if="unAppliedCount",)
+			table.table.table-striped.table-hover
+				thead
+					tr
+						th Невыполненные миграции ({{ appliedCount }})
+						th.text-right
+							button.btn.btn-primary(
+								type="button",
+								@click="executeAll()",
+								:class="{'loading': migrationExecuting}",
+								:disabled="migrationExecuting",
+							) Выполнить все миграции
+				tbody
+					tr(v-for="unApplied in unAppliedMigrations",)
+						td {{ unApplied }}
+						th.text-right
+							button.btn(
+								type="button",
+								@click="executeMigration(unApplied)",
+								:class="{'loading': migrationExecuting}",
+								:disabled="migrationExecuting",
+							) Выполнить миграцию
+		div(v-if="appliedCount",)
+			table.table.table-hover
+				thead
+					tr
+						th Выполненые миграции ({{ appliedCount }})
+						th &nbsp;
+				tbody
+					tr(v-for="(applied, index) in appliedMigrations",)
+						td {{ applied.name }}
+						td.text-right(
+							v-if="applied.in_last_batch && (index === lastBatchFirstIndex)",
+							:rowspan="lastBatchCount",
+						)
+							button.btn(
+								type="button",
+								@click="rollbackLastBranch()",
+								:class="{'loading': migrationExecuting}",
+								:disabled="migrationExecuting",
+							) Откатить
+						td(v-if="!applied.in_last_batch",)

@@ -1,0 +1,16 @@
+{
+    "jsRules": {
+        "indent": [
+            true,
+            "tabs"
+        ]
+    },
+    "rules": {
+        "indent": [
+            true,
+            "tabs"
+        ],
+        "no-string-literal": false
+    },
+    "extends": "tslint:recommended"
+}

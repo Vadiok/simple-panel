@@ -1,0 +1,157 @@
+div
+	div(v-if="formStatus.complete")
+		p
+			.toast(:class="{'toast-success': !formStatus.warning, 'toast-danger': formStatus.warning}")
+				div
+					strong Файл конфигурации успешно создан
+				div(v-if="formStatus.warningMessage")
+					br
+					| {{ formStatus.warningMessage }}
+		p Вернитесь на
+			=' '
+			a(:href='homePath') главную,
+			=' '
+			| чтобы продолжить пользоваться системой.
+	br
+	div(v-if="!formStatus.complete")
+		h4 Укажите первоначальные настройки
+		form.form-horizontal(@submit.prevent="setConfig",)
+
+			h5 Параметры панели
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-panelName",) Название панели
+				.col-6.col-md-9.col-sm-6
+					input.form-input(id="initial-config-panelName", v-model="panelName", type="text",)
+
+			h5 Локальные настройки
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-baseUrl",) Относительный URL
+				.col-6.col-md-9.col-sm-6
+					input.form-input(id="initial-config-baseUrl", v-model="baseUrl", type="text",)
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-session.prefix",) Префикс сессий
+				.col-6.col-md-9.col-sm-6
+					input.form-input(id="initial-config-session.prefix", v-model="session.prefix", type="text",)
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-devMode",) Режим разработки
+				.col-6.col-md-9.col-sm-6
+					label.form-switch(for="initial-config-devMode",)
+						input(id="initial-config-devMode", v-model="devMode", type="checkbox",)
+						i.form-icon
+						| В этом режиме Twig не кешируется
+
+			h6 Системный администратор
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-systemAdmin.login",) Логин
+				.col-6.col-md-9.col-sm-6
+					input.form-input(id="initial-config-systemAdmin.login", v-model="systemAdmin.login", type="text",)
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-systemAdmin.password",) Пароль
+				.col-6.col-md-9.col-sm-6
+					input.form-input(id="initial-config-systemAdmin.password", v-model="systemAdmin.password", type="text",)
+					p
+						sub
+							| Пароль будет храниться в открытом виде в файле конфигурации.
+							br
+							| Оставьте поле пароля пустым, если не требуется использовать аккаунт.
+
+			h6 Миграции
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-migrations.creationInterface",) Интерфейс создания
+				.col-6.col-md-9.col-sm-6
+					label.form-switch(for="initial-config-migrations.creationInterface",)
+						input(id="initial-config-migrations.creationInterface", v-model="migrations.creationInterface", type="checkbox",)
+						i.form-icon
+						| Рекомендуется использовать только локально
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-migrations.runInterface",) Интерфейс запуска
+				.col-6.col-md-9.col-sm-6
+					label.form-switch(for="initial-config-migrations.runInterface",)
+						input(id="initial-config-migrations.runInterface", v-model="migrations.runInterface", type="checkbox",)
+						i.form-icon
+						| Рекомендуется использовать только локально
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-migrations.runRoute",) Путь для запуска
+				.col-6.col-md-9.col-sm-6
+					label.form-switch(for="initial-config-migrations.runRoute",)
+						input(id="initial-config-migrations.runRoute", v-model="migrations.runRoute", type="checkbox",)
+						i.form-icon
+						| Рекомендуется использовать везде
+
+			h6 Настройки подключения к базе данных
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-db.driver",) Тип базы данных
+				.col-6.col-md-9.col-sm-6
+					select.form-input.form-select(id="initial-config-db.driver", v-model="db.driver",)
+						option(value='mysql') MySQL
+						option(value='sqlite') SQLite
+						option(value='pgsql') Postgres
+						option(value='sqlsrv') SQL Server
+			.form-group(v-if="!isSqlite")
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-db.host",) Хост / Порт
+				.col-6.col-md-9.col-sm-6
+					.input-group
+						input.form-input(id="initial-config-db.host", v-model="db.host", type="text",)
+						input.form-input(id="initial-config-db.port", v-model="db.port", type="text",)
+			.form-group(v-if="!isSqlite")
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-db.user",) Логин / Пароль
+				.col-6.col-md-9.col-sm-6
+					.input-group
+						input.form-input(id="initial-config-db.user", v-model="db.user", type="text",)
+						input.form-input(id="initial-config-db.password", v-model="db.password", type="text",)
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-db.name",)
+						span(v-if="!isSqlite") Имя БД
+						span(v-else="") Путь к файлу БД
+				.col-6.col-md-9.col-sm-6
+					input.form-input(id="initial-config-db.name", v-model="db.name", type="text",)
+					p(v-if="isSqlite")
+						sub
+							| Можно указать путь относительно расположения каталога панели (пример: <code>db/panel.sqlite</code>)
+							| или полный путь от корневого каталога (пример: <code>/var/www/site/panel/db/panel.sqlite</code>)
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-db.table_prefix",) Префикс таблиц
+				.col-6.col-md-9.col-sm-6
+					input.form-input(id="initial-config-db.table_prefix", v-model="db.table_prefix", type="text",)
+
+			h5 Аккаунта администратора
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-adminManager.create",) Создать аккаунт
+				.col-6.col-md-9.col-sm-6
+					label.form-switch(for="initial-config-adminManager.create",)
+						input(id="initial-config-adminManager.create", v-model="adminManager.create", type="checkbox",)
+						i.form-icon
+			.form-group(v-if="adminManager.create")
+				.col-3.col-sm-6
+					label.form-label(for="initial-config-adminManager.email",) Email / Пароль
+				.col-6.col-md-9.col-sm-6
+					.input-group
+						input.form-input(id="initial-config-adminManager.email", v-model="adminManager.email", :required="adminManager.create", type="email",)
+						input.form-input(id="initial-config-adminManager.password", v-model="adminManager.password", :required="adminManager.create", type="password",)
+
+			.form-group(v-if="message.show")
+				.col-3.col-sm-6
+				.col-6.col-md-9.col-sm-6
+					.toast(:class="{'toast-info': (message.type === 'info'), 'toast-danger': (message.type === 'warning'), 'toast-success': (message.type === 'success')}")
+						.btn.btn-clear.float-right(@click.prevent="hideMessage",)
+						| {{ message.content }}
+
+			.form-group
+				.col-3.col-sm-6
+				.col-6.col-md-9.col-sm-6
+					button.btn.btn-primary(type="submit", :disabled="formStatus.disabled",) Установить

@@ -1,0 +1,79 @@
+div
+
+	hr
+	h4
+		button.btn.btn-sm(type="button", @click="toggleContent",)
+			span(v-if="!collapseContent") &ndash;
+			span(v-else) +
+		=' '
+		| Работа с файлами миграций
+
+	div(v-show="!collapseContent")
+		p
+			strong Создать миграцию
+		form.form-horizontal(@submit.prevent="createMigrationFile",)
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="create-migration-newMigration.fileName",) Название миграции
+				.col-6.col-md-9.col-sm-6
+					input.form-input(
+						id="create-migration-newMigration.fileName",
+						v-model="newMigration.fileName",
+						type="text",
+						:class="{'is-danger': newMigrationFormErrors.fileName}"
+					)
+					p.form-input-hint(v-if="newMigrationFormErrors.fileName") {{ newMigrationFormErrors.fileName }}
+					p.form-input-hint(v-if="newMigrationClassName") Название класса: {{ newMigrationClassName }}
+					p.form-input-hint(v-if="newMigrationFileName") Название файла: {{ newMigrationFileName }}
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="create-migration-newMigration.tableName",) Для таблицы
+				.col-6.col-md-9.col-sm-6
+					input.form-input(
+						id="create-migration-newMigration.tableName",
+						v-model="newMigration.tableName",
+						type="text",
+						:class="{'is-danger': newMigrationFormErrors.tableName}"
+					)
+					p.form-input-hint(v-if="newMigrationFormErrors.tableName") {{ newMigrationFormErrors.tableName }}
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="create-migration-newMigration.create",) Создать таблицу
+				.col-6.col-md-9.col-sm-6
+					label.form-switch(for="create-migration-newMigration.create",)
+						input(id="create-migration-newMigration.create", v-model="newMigration.create", type="checkbox", :disabled="switchersDisabled",)
+						i.form-icon
+						| Добавить базовый код для создания таблицы
+			.form-group
+				.col-3.col-sm-6
+					label.form-label(for="create-migration-newMigration.update",) Изменить таблицу
+				.col-6.col-md-9.col-sm-6
+					label.form-switch(for="create-migration-newMigration.update",)
+						input(id="create-migration-newMigration.update", v-model="newMigration.update", type="checkbox", :disabled="switchersDisabled",)
+						i.form-icon
+						| Добавить базовый код для изменения таблицы
+			.form-group
+				.col-3.col-sm-6
+				.col-6.col-md-9.col-sm-6
+					button.btn.btn-primary(type="submit", :disabled="!formValid || formLoading || listLoading",) Добавить
+
+		div(v-if="unAppliedCount",)
+			table.table.table-striped.table-hover
+				thead
+					tr
+						th Невыполненные миграции ({{ unAppliedCount }})
+						th &nbsp;
+				tbody
+					tr(v-for="unApplied in unAppliedMigrations",)
+						td {{ unApplied }}
+						th.text-right
+							button.btn(type="button", @click="removeFile(unApplied)") Удалить файл
+
+		div(v-if="appliedCount",)
+			table.table.table-striped.table-hover
+				thead
+					tr
+						th Выполненые миграции ({{ appliedCount }})
+				tbody
+					tr(v-for="(applied, index) in appliedMigrations",)
+						td {{ applied.name }}

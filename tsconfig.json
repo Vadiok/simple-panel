@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es5",
+		"sourceMap": true,
+		"lib": ["DOM", "ES5", "ES2015.Promise"],
+		"allowJs": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"moduleResolution": "node",
+		"noImplicitAny": false
+	},
+	"files": [
+		"./assets/src/scripts/require.d.ts"
+	],
+	"exclude": [
+		"node_modules"
+	]
+}
